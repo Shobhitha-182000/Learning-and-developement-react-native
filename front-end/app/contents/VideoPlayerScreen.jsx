@@ -7,8 +7,8 @@
 // const VideoPlayerScreen = ({ route }) => {
 //   const { videoUrl } = route.params;
 
-//   // // Extract video ID from URL (if necessary)
-//   // const videoId = videoUrl.split('v=')[1].split('&')[0];
+ 
+ 
 
 //   return (
 //     <View style={styles.container}>

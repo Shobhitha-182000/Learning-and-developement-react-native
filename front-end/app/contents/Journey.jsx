@@ -6,7 +6,7 @@ import axios from 'axios';
 import imagePaths from './imagePaths';
 
 const courses = [
-  { id: '1', name: 'Web Development', image: imagePaths.webDevelopment, description: 'Learn the fundamentals of web development.', rating: '4.5/5',videoUrl:"hnVOvvbQrwA"  },
+  { id: '1', name: 'Web Development', image: imagePaths.webDevelopment, description: 'Learn the fundamentals of web development.', rating: '4.5/5', videoUrl:"hnVOvvbQrwA"  },
   { id: '2', name: 'Java Developer', image: imagePaths.javaDeveloper, description: 'Master Java programming with practical examples.', rating: '3/5', videoUrl:"fMMz9UUjFY8&list=PLhvdldYcnZMku_viVb2tU7NuW5DZxwIfw"  },
   { id: '3', name: 'Machine Learning', image: imagePaths.machineLearning, description: 'Explore machine learning algorithms and their applications.', rating: '4.8/5', videoUrl: 'AYgMefUlKq8' },
   { id: '4', name: 'Python Developer', image: imagePaths.pythonDeveloper, description: 'Become proficient in Python programming.', rating: '4.6/5', videoUrl: 'KEku-6CBX6M&list=PL9ooVrP1hQOE4KoZLUP4LgBwFH2IJCQs6' },
@@ -55,14 +55,14 @@ const Journey = ({ userId }) => {
       Alert.alert('Course Already Added', 'This course is already in your cart.');
     } else {
       try {
-        // await axios.post(`http://localhost:5000/enrollCourse/${userId}`
-         await axios.post(`http://10.0.2.2:8000/enrollCourse/${userId}`, {
+        // await axios.post(`http://localhost:5000/enrollCourse/${userId}`,{
+        await axios.post(`http://10.0.2.2:8000/enrollCourse/${userId}`, {
           courseId: course.id,
           courseName: course.name,
           description: course.description,
           imagePath: course.image,
-          videoUrl:course.videoUrl,
-          description:course.description,
+          videoUrl: course.videoUrl,
+          description: course.description,
           rating: parseFloat(course.rating.split('/')[0]),
         });
         setEnrolledCourses(prev => [...prev, course.id]);
@@ -88,11 +88,8 @@ const Journey = ({ userId }) => {
         ))}
       </View>
     );
-   
   };
-  const handleImagePress = (course) => {
-    // navigation.navigate('Webdev', { videoUrl: course.videoUrl });
-  };
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -102,15 +99,12 @@ const Journey = ({ userId }) => {
           <View style={[styles.card, { width: (Dimensions.get('window').width / numColumns) - 15 }]}>
             <View style={styles.imageContainer}>
               <Image source={item.image} style={styles.image} />
-            </View>
-             
-            <View style={styles.content}>
-            <Text style={styles.title}>{item.name}</Text> 
-               
-              
-              <View style={styles.ratingContainer}>
+              <View style={styles.ratingOverlay}>
                 {renderStars(item.rating)}
               </View>
+            </View>
+            <View style={styles.content}>
+              <Text style={styles.title}>{item.name}</Text>
             </View>
             <TouchableOpacity
               style={styles.buttonContainer}
@@ -149,23 +143,35 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     margin: 5,
     flexDirection: 'row',
-    height: 180,
+    height: 200, 
+    position: 'relative',
   },
   imageContainer: {
-    width: '40%',
-    height: '100%',
+    width: '60%',
+    height: '100%',  
+    overflow: 'hidden',
+    borderTopLeftRadius: 8,
+    borderBottomLeftRadius: 8,
+    position: 'relative',
   },
   image: {
     width: '100%',
-    height: '100%',
-    borderTopLeftRadius: 8,
-    borderBottomLeftRadius: 8,
-    resizeMode: 'cover',
+    height: 150,  
+    resizeMode: 'contain',  
+  },
+  ratingOverlay: {
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',  
+    borderRadius: 5,
+    padding: 5,
   },
   content: {
     flex: 1,
     padding: 10,
     justifyContent: 'center',
+   marginBottom:50
   },
   title: {
     fontSize: 20,
@@ -173,25 +179,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#001F3F',
   },
-  ratingContainer: {
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
   buttonContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#008000',
-    height: 40,
+    height: 30,
     borderRadius: 5,
-    margin: 10,
     width: 100,
-    marginRight: 20,
-    marginTop:120
+    position: 'absolute',
+    right: 30,
+    bottom: 10,
   },
   buttonText: {
     color: '#fff',
     fontSize: 15,
     fontWeight: 'bold',
+  },
+  ratingContainer: {
+    flexDirection: 'row',
   },
 });
 

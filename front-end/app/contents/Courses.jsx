@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, FlatList, Dimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, FlatList, Dimensions, Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import axios from 'axios';
-// import YoutubePlayer from 'react-native-youtube-iframe';
- 
+
 const localImages = {
   'Web Development': require('./fullstack.png'),
   'Java Developer': require('./java develop.jpeg'),
@@ -23,11 +22,10 @@ const Courses = ({ userId }) => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-         
         const response = await axios.get(`http://10.0.2.2:8000/enrollCourse/${userId}`);
         // const response = await axios.get(`http://localhost:5000/enrollCourse/${userId}`);
         console.log('Courses data:', response.data);
-        setCourses(response.data.courses || []); 
+        setCourses(response.data.courses || []);
       } catch (error) {
         console.log('Error fetching courses:', error);
       }
@@ -52,7 +50,9 @@ const Courses = ({ userId }) => {
   };
 
   const handleImagePress = (course) => {
-    // navigation.navigate('VideoPlayer', { videoUrl: course.videoUrl });
+    const url = 'https://web.dev/learn';
+    Linking.openURL(url)
+      .catch(err => console.error('An error occurred', err));
   };
 
   const renderStars = (rating) => {
@@ -86,7 +86,7 @@ const Courses = ({ userId }) => {
   };
 
   const getImageSource = (courseName) => {
-    return localImages[courseName] || localImages['default'];  
+    return localImages[courseName] || localImages['default'];
   };
 
   return (
@@ -95,7 +95,7 @@ const Courses = ({ userId }) => {
         key={numColumns}
         data={courses}
         renderItem={({ item }) => (
-          <View style={[styles.card, { width: (Dimensions.get('window').width / numColumns) - 15 }]}>
+          <View style={[styles.card, { width: (Dimensions.get('window').width / numColumns) - 10 }]}>
             <TouchableOpacity
               onPress={() => handleCardPress(item._id)}
               style={styles.imageContainer}
@@ -106,10 +106,7 @@ const Courses = ({ userId }) => {
               />
             </TouchableOpacity>
             <View style={styles.content}>
-              <Text style={styles.title}>{item.courseName}</Text> 
-              {/* <View style={styles.ratingContainer}>
-                {renderStars(item.rating)}
-              </View> */}
+              <Text style={styles.title}>{item.courseName}</Text>
               <Text style={styles.price}>{item.description}</Text>
             </View>
             <TouchableOpacity
@@ -131,7 +128,7 @@ const Courses = ({ userId }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    padding: 5, 
     backgroundColor: '#f4f4f4',
   },
   list: {
@@ -145,20 +142,22 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
-    margin: 5,
+    margin: 5,  
     flexDirection: 'row',
-    height: 180,
+    height: 200,
   },
-  imageContainer: {
-    width: '40%',
-    height: '100%',
+ imageContainer: {
+    width: '60%',
+    height: '100%',  
+    overflow: 'hidden',
+    borderTopLeftRadius: 8,
+    borderBottomLeftRadius: 8,
+    position: 'relative',
   },
   image: {
     width: '100%',
-    height: '100%',
-    borderTopLeftRadius: 8,
-    borderBottomLeftRadius: 8,
-    resizeMode: 'cover',
+    height: 150,  
+    resizeMode: 'contain',  
   },
   content: {
     flex: 1,
@@ -183,13 +182,13 @@ const styles = StyleSheet.create({
   buttonContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#008000',
-    height: 40,
+    backgroundColor: 'darkorange',
+    height: 30,
     borderRadius: 5,
-    margin: 10,
-    marginTop: 120,
     width: 90,
-    marginRight: 20,
+    position: 'absolute',
+    right: 230,
+    bottom: 10,
   },
   buttonText: {
     color: '#fff',

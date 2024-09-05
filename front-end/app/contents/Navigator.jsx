@@ -5,7 +5,7 @@ import Dashboard from './Dashboard';
 import Journey from './Journey';
 import Courses from './Courses';
  
-import { useUser } from '../UserContext'; // Import useUser
+import { useUser } from '../UserContext'; 
 import Profile from './Profile';
 
 const Tab = createBottomTabNavigator();
@@ -27,7 +27,7 @@ const TabNavigator = () => {
           } else if (route.name === 'Courses') {
             iconName = focused ? 'stats-chart' : 'stats-chart-outline';
           } else if (route.name === 'Profile') {
-            iconName = focused ? 'person' : 'person-outline'; // Use profile icon
+            iconName = focused ? 'person' : 'person-outline';  
           }
           return <Icon name={iconName} size={size} color={color} />;
         },

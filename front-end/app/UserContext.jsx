@@ -5,7 +5,7 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
 
-  // Function to update userId
+ 
   const updateUserId = (id) => setUserId(id);
 
   return (

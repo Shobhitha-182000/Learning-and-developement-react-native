@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, Button, StyleSheet, Alert, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, Alert, TextInput, TouchableOpacity } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
+ 
+//  const  BASE_URL = 'http://localhost:5000';  
+const  BASE_URL = 'http://10.0.2.2:8000';  
 
-const Profile = ({userId}) => {
+const Profile = ({ userId }) => {
   const navigate = useNavigation();
 
   const [userData, setUserData] = useState(null);
@@ -15,12 +18,13 @@ const Profile = ({userId}) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // const response = await axios.get(`http://localhost:5000/studylogin/${userId}`);  
-        const response = await axios.get(`http://10.0.2.2:8000/studylogin/${userId}`);  
+        const response = await axios.get(`${BASE_URL}/studylogin/${userId}`);
         setUserData(response.data);
         setUsername(response.data.username);
         setEmail(response.data.email);
         setImageUri(response.data.profileImage || '');  
+        const enrollResponse = await axios.get(`${BASE_URL}/enrollCourse/${userId}`);
+        console.log('Courses data:', enrollResponse.data);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -37,7 +41,6 @@ const Profile = ({userId}) => {
         console.log('ImagePicker Error: ', response.errorMessage);
       } else {
         setImageUri(response.assets[0].uri);
- 
       }
     });
   };
@@ -56,8 +59,7 @@ const Profile = ({userId}) => {
         });
       }
   
-      // const response = await axios.put(`http://localhost:5000/studysignups/${userId}`
-      const response = await axios.put(`http://10.0.2.2:8000/studysignups/${userId}` , formData, {
+      await axios.put(`${BASE_URL}/studysignups/${userId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -69,7 +71,6 @@ const Profile = ({userId}) => {
       Alert.alert('Update Failed', 'Failed to update profile. Please try again later.');
     }
   };
-  
 
   const handleLogout = () => {
     navigate.navigate('MainPage');
@@ -87,6 +88,8 @@ const Profile = ({userId}) => {
           <Text style={styles.uploadButtonText}>+</Text>
         </TouchableOpacity>
       </View>
+      <Text style={styles.usernameText}>{username}</Text>
+      <Text style={styles.emailText}>{email}</Text>
       <TextInput
         style={styles.input}
         value={username}
@@ -114,11 +117,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5', 
+    backgroundColor: '#f5f5f5',
   },
   imageContainer: {
     alignItems: 'center',
     marginBottom: 20,
+    position: 'relative',
   },
   profileImage: {
     width: 100,
@@ -131,8 +135,8 @@ const styles = StyleSheet.create({
   uploadButton: {
     position: 'absolute',
     bottom: 0,
-    right: 0,
-    backgroundColor: '#007bff', // Blue color for button
+    right: 140,
+    backgroundColor: '#007bff',
     width: 30,
     height: 30,
     borderRadius: 15,
@@ -140,12 +144,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#007bff',
-    marginRight:140
   },
   uploadButtonText: {
     color: '#fff',
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
+  },
+  usernameText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  emailText: {
+    fontSize: 16,
+    color: '#888',
+    marginBottom: 20,
+    textAlign: 'center',
   },
   input: {
     height: 40,
@@ -157,7 +172,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   saveChanges: {
-    backgroundColor: 'teal',  
+    backgroundColor: 'teal',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
@@ -169,7 +184,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   logoutButton: {
-    backgroundColor: 'chocolate', // Red color for button
+    backgroundColor: 'chocolate',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
