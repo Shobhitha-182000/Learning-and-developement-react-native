@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
+import axios from 'axios';
+import VideoPlayer from './VideoPlayer '
  
 
 const { width } = Dimensions.get('window');
 
 const chapters = [
+ 
   { id: '1', title: 'Chapter 1', videoSource: require('../../assets/videos/chapter1.mp4') },
   { id: '2', title: 'Chapter 2', videoSource: require('../../assets/videos/chapter2.mp4') },
   { id: '3', title: 'Chapter 3', videoSource: require('../../assets/videos/chapter3.mp4') },
@@ -12,12 +15,28 @@ const chapters = [
   { id: '5', title: 'Chapter 5', videoSource: require('../../assets/videos/chapter5.mp4') },
 ];
 
-export default function VideoPlayerScreen() {
+ 
+
+export default function VideoPlayerScreen({userId}) {
   const [videoVisible, setVideoVisible] = useState(false);
   const [currentVideo, setCurrentVideo] = useState(null);
   const [currentChapter, setCurrentChapter] = useState(null);
   const [isCompletionAlertVisible, setIsCompletionAlertVisible] = useState(false);
-  const [completedChapters, setCompletedChapters] = useState(0); // Track completed chapters
+  const [completedChapters, setCompletedChapters] = useState(0);
+
+  useEffect(() => {
+   
+    const fetchProgress = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/userprogress/${userId}`);
+        setCompletedChapters(response.data.percentage || 0);
+      } catch (error) {
+        console.error('Error fetching user progress:', error);
+      }
+    };
+
+    fetchProgress();
+  }, []);
 
   const showVideo = (videoSource, chapter) => {
     setCurrentVideo(videoSource);
@@ -25,10 +44,20 @@ export default function VideoPlayerScreen() {
     setVideoVisible(true);
   };
 
-  const handleVideoCompletion = () => {
+  const handleVideoCompletion = async () => {
     setVideoVisible(false);
     setIsCompletionAlertVisible(true);
-    setCompletedChapters(prev => prev + 1); // Increment completed chapters
+    const newCompletedChapters = completedChapters + 1;
+    setCompletedChapters(newCompletedChapters);
+
+    try {
+      await axios.post('http://localhost:3000/userprogress', {
+        userId,
+        percentage: (newCompletedChapters / chapters.length) * 100,
+      });
+    } catch (error) {
+      console.error('Error saving user progress:', error);
+    }
   };
 
   const handleConfirmation = () => {
@@ -44,7 +73,6 @@ export default function VideoPlayerScreen() {
     setIsCompletionAlertVisible(false);
   };
 
-  // Calculate percentage of completed chapters
   const progressPercentage = (completedChapters / chapters.length) * 100;
 
   return (

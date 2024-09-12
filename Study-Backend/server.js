@@ -6,11 +6,12 @@ const path = require('path');
 const os = require('os');
 const nodemailer=require('nodemailer')
 
-// Import models
+ 
 const signup = require('./signup'); 
 const image = require('./image');
 const Course=require('./Course.jsx')
 const Enrollment = require('./enrollment');
+const userprogress=require('./userProgressSchema.js')
 
 const app = express();
 app.use(express.json());
@@ -326,6 +327,46 @@ app.post('/resetpassword', async (req, res) => {
     res.status(200).json({ message: 'Password reset successful' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
+  }
+});
+
+
+
+app.post("/userprogress", async (req, res) => {
+  try {
+    const { userId, percentage } = req.body;
+
+    if (!userId || percentage === undefined) {
+      return res.status(400).json({ message: 'User ID and percentage are required' });
+    }
+
+    if (percentage < 0 || percentage > 100) {
+      return res.status(400).json({ message: 'Percentage must be between 0 and 100' });
+    }
+
+    const newProgress = await userprogress.create({ userId,percentage});
+
+    res.status(201).json({ message: 'Progress created successfully', data: newProgress });
+  } catch (err) {
+    console.error('Error in creating user progress:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+app.get("/userprogress/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log('progresss',userId)
+
+    const userProgress = await userprogress.findOne({ userId });
+
+    if (!userProgress) {
+      return res.status(404).json({ message: 'User progress not found' });
+    }
+    res.status(200).json(userProgress);
+  } catch (err) {
+    console.error('Error in fetching user progress:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
 

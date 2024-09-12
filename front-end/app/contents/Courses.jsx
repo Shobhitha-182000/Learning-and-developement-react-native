@@ -53,7 +53,7 @@ const Courses = ({ userId }) => {
     // const url = 'https://web.dev/learn';
     // Linking.openURL(url)
     //   .catch(err => console.error('An error occurred', err));
-    navigation.navigate('VideoPlayerScreen')
+    navigation.navigate('VideoPlayerScreen', { userId})
   };
 
   const renderStars = (rating) => {
